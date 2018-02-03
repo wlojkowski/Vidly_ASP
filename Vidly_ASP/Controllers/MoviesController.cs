@@ -6,6 +6,7 @@ using System.Data.Entity;
 using Vidly.Models;
 using Vidly.ViewModels;
 using Vidly_ASP.Models;
+using Vidly_ASP.ViewModels;
 
 namespace Vidly.Controllers
 {
@@ -57,6 +58,40 @@ namespace Vidly.Controllers
             return View(movies);
         }
 
+        public ActionResult New()
+        {
+            var genres = _context.Genres.ToList();
+
+            MovieFormViewModel viewModel = new MovieFormViewModel
+            {
+                Genres = genres
+            };
+
+            return View("MovieForm", viewModel);
+        }
+
+        [HttpPost]
+        public ActionResult Save(Movie movie)
+        {
+            if (movie.Id == 0)
+            {
+                _context.Movies.Add(movie);
+            }
+            else
+            {
+                var movieInDb = _context.Movies.Single(m => m.Id == movie.Id);
+
+                movieInDb.Name = movie.Name;
+                movieInDb.NumberInStock = movie.NumberInStock;
+                movieInDb.ReleasedDate = movie.ReleasedDate;
+                movieInDb.DateAdded = movie.DateAdded;
+                movieInDb.GenreId = movie.GenreId;
+            }
+
+            _context.SaveChanges();
+
+            return RedirectToAction("Index", "Movies");
+        }
 
         public ActionResult Details(int id)
         {
@@ -70,7 +105,22 @@ namespace Vidly.Controllers
 
         public ActionResult Edit(int id)
         {
-            return Content("id=" + id);
+            var movie = _context.Movies.Single(m => m.Id == id);
+
+            if (movie == null)
+            {
+                return HttpNotFound();
+            }
+
+            var genres = _context.Genres.ToList();
+
+            MovieFormViewModel viewModel = new MovieFormViewModel
+            {
+                Genres = genres,
+                Movie = movie
+            };
+
+            return View("MovieForm", viewModel);
         }
 
         [Route("movies/released/{year}/{month:regex(\\d{2}):range(1,12)}")]

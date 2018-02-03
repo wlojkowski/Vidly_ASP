@@ -5,6 +5,8 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@Html.ActionLink("New customer", "New", "Customers", null, new { @class = "btn btn-primary" })
+
 @if (Model.Any())
 {
     <table class="table table-bordered table-hover">
@@ -19,7 +21,7 @@
             {
                 <tr>
                     <td>
-                        @Html.ActionLink(customer.Name, "Details", "Customers", new {id = customer.Id}, null)
+                        @Html.ActionLink(customer.Name, "Edit", "Customers", new { id = customer.Id }, null)
                     </td>
                     <td>
                         @customer.MembershipType.Name
